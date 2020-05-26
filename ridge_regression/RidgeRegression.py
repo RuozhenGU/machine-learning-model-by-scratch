@@ -3,7 +3,9 @@ import pandas as pd
 from numpy import linalg
 
 
+
 class RidgeRegression:
+
 
     """
         Ridge Regression using Gradient Descent
@@ -21,6 +23,7 @@ class RidgeRegression:
         self.b = []
         self.closed_form = closed_form
         self.normalize = normalize
+        print(closed_form)
 
     def cost_function(self, w, b, X, y):
         """
@@ -52,15 +55,6 @@ class RidgeRegression:
         return (1. / n) * (y - X @ w)
 
 
-    @staticmethod
-    def normalize(X, y, X_test, y_test):
-        ''' normalize input by subtract mean'''
-        X -= np.mean(X, axis=0)
-        X_test -= np.mean(X_test, axis=0)
-        return X, X_test
-        
-
-
     def gradient_descent(self, X, y, X_test, y_test, w, b):
         '''Gradient descent for ridge regression'''
 
@@ -85,9 +79,9 @@ class RidgeRegression:
             if self.closed_form:
                 b = self.closed_form_b(X, y, w)
             else:
-                b = b - (self.lr / n) * (X @ w + b - y)
+                b = b - ((self.lr / n) * (X @ w + b - y))
            
-            # gradient vanish
+            #terminate condition
             if len(self.w) > 0 and linalg.norm((self.w)[-1] - w) <= self.tol:
                 print("no long descent at epoch=%d" % i+1)
                 break
@@ -95,9 +89,18 @@ class RidgeRegression:
             # save
             (self.w).append(w)
             (self.b).append(b)
-
+        
         return w, b
+    
 
+    def normalize_data(self, X, y, X_test, y_test):
+        ''' normalize input by subtract mean'''
+        X -= np.mean(X, axis=0)
+        X_test -= np.mean(X_test, axis=0)
+        y -= np.mean(y, axis=0)
+        y_test -= np.mean(y_test, axis=0)
+        return X, X_test, y, y_test
+        
 
     def fit(self, X, y, X_test, y_test):
         
@@ -107,7 +110,7 @@ class RidgeRegression:
         
         # normalize X
         if self.normalize:
-            X, X_test = normalize(self, X, y, X_test, y_test)
+            X, X_test, y, y_test = self.normalize_data(X, y, X_test, y_test)
             
         # fit the model
         w, b = self.gradient_descent(X, y, X_test, y_test, w0, b0)
