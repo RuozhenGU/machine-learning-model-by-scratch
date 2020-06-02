@@ -1,6 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 from RidgeRegression import RidgeRegression
+from numpy import linalg
 
 
 def load_data(path='./'):
@@ -27,15 +28,15 @@ def main(path='./', plot=True):
 
     housing_X_test, housing_X_train, housing_y_test, housing_y_train = load_data(path)
 
-    clf = RidgeRegression(max_pass=200000, 
-                          _lambda=10, 
-                          lr=0.00000001, 
+    clf = RidgeRegression(max_pass=200000,
+                          _lambda=10,
+                          lr=0.00000001,
                           tol=1e-9,
                           closed_form=True,
                           normalize=True)
 
-    clf.fit(housing_X_train, housing_y_train, housing_X_test, housing_y_test)
-
+    w,b = clf.fit(housing_X_train, housing_y_train, housing_X_test, housing_y_test)
+    print(b, linalg.norm(b))
     if plot:
 
         train_loss = clf.train_loss
